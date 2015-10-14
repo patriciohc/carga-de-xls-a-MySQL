@@ -14,10 +14,8 @@ DB_USER = 'root'
 DB_PASS = 'root' 
 DB_NAME = 'laboratorio' 
 
-# variables que defienen la posicion de las celdas donde se encuentran
-# la informacion en el archivo xls neseearia para crear el archivo xml
-# con el formato necesario para gurdarlo en base de datos
-C = 1 # columnas 
+# variables que definen la posicion de las celdas donde se encuentran
+# la informacion en el archivo xlsC = 1 # columnas 
 R = 0 # filas
 PARA = (0,2)
 LABORATORISTA = (0,3)
