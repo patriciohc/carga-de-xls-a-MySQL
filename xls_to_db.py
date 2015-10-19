@@ -32,7 +32,14 @@ OBSERVACIONES = 0 #columna = 1, fila = ultimo analisis + tres filas
 
 logging.basicConfig(filename='./loginfo.log', level=logging.INFO)
 
-
+MSG_NO_FILE = """"
+No ha seleccionado ningun archivo!
+De clic en el boton choose y vuelva a intentarlo.
+"""
+MSG_DONE = """
+El archivo se cargado correctamente, consulte el
+archivo info.log para mas detalles.
+"""
 
 class Xls_to_db(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -40,6 +47,7 @@ class Xls_to_db(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.btChooseFile.clicked.connect(self.show_dialog)
         self.btLoadFile.clicked.connect(self.load_file)
+        self.btClose.clicked.connect(exit)
 
     def show_dialog(self):
         fname = QFileDialog.getOpenFileName(self, 'Open file', './')
@@ -47,9 +55,20 @@ class Xls_to_db(QMainWindow, Ui_MainWindow):
 
     def load_file(self):
         fname = self.txtFile.text()
-        self.xls = open_workbook(fname)
+        try:
+            self.xls = open_workbook(fname)
+        except IOError:
+            self.msg_info(MSG_NO_FILE)
+            return 0
         self.db = DB()
         self.process_book()
+        self.msg_info(MSG_DONE)
+
+    def msg_info(self,msg):
+        # QMessageBox.information (QWidget parent, QString caption, QString text,
+        # int button0, int button1 = 0, int button2 = 0)
+        QMessageBox.information(self, "Informacion", msg, QMessageBox.Ok)
+
 
     def process_book(self):
         for sheet_index in range(self.xls.nsheets):

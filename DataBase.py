@@ -14,7 +14,6 @@ class DB():
         self.conn = MySQLdb.connect(*datos)  # Conectar a la base de datos 
 
     def run_query(self,query):
-        #logging.info(query)
         print(query)
         cursor = self.conn.cursor()  # Crear un cursor 
         try:
@@ -25,8 +24,8 @@ class DB():
                 self.conn.commit()
                 data = None
         except MySQLdb.Error as err:
-            logging.error("error msyql en sentencia: ")
-            logging.error(query)
+            logging.error(err[1])
+            #logging.error(query)
             data = None
         cursor.close()  # Cerrar el cursor
         return data
