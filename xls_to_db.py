@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #encoding:utf-8
 import logging
 from xlrd import open_workbook
@@ -7,6 +8,8 @@ import sys
 from Choose_file import Ui_MainWindow
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+from DataBase import DB
+from Modelos import *
 
 
 # variables que definen la posicion de las celdas donde se encuentran
@@ -35,15 +38,15 @@ class Xls_to_db(QMainWindow, Ui_MainWindow):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
-        self.bt_choose_file.clicked.connect(self.show_dialog)
-        self.bt_load_file.click.connect(self.load_file)
+        self.btChooseFile.clicked.connect(self.show_dialog)
+        self.btLoadFile.clicked.connect(self.load_file)
 
     def show_dialog(self):
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')
-        self.txt_file.setText(fname)
+        fname = QFileDialog.getOpenFileName(self, 'Open file', './')
+        self.txtFile.setText(fname)
 
     def load_file(self):
-        fname = txt_file.getText()
+        fname = self.txtFile.text()
         self.xls = open_workbook(fname)
         self.db = DB()
         self.process_book()
@@ -55,10 +58,10 @@ class Xls_to_db(QMainWindow, Ui_MainWindow):
 
     def process_sheet(self,sheet):
         sheet_name = sheet.name
+        print "procesando: " + sheet_name
         if sheet.ncols < 8 or sheet.nrows < 14:  # no cumple con el tamaño adecuado
             logging.info("sheet %s: no se hace nada numero de columnas o filas no cumple" % (sheet_name))
             return 0
-        print "procesando: " + sheet_name
         folio = sheet.cell( FOLIO[C], FOLIO[R]).value
         if (folio == "" or folio == None):  # comprueba que exista numero de folio
             print "no se hace nada para: " + sheet_name  
@@ -115,13 +118,14 @@ class Xls_to_db(QMainWindow, Ui_MainWindow):
                 fila_actual += 1
                 continue
             des_muestra = sheet.cell(fila_actual, DESCRIPCION_MUESTRA).value
+            des_muestra = des_muestra.replace("'"," ")
             no_colada = sheet.cell(fila_actual, NO_COLADA).value
             no_muestra = sheet.cell(fila_actual, NO_MUESTRA).value
-            registro = Registro(no_analisis, nombre='ESCORIA')
+            registro = Registro(no_analisis)
             registro.save(self.db)
             muestra = Escoria(no_analisis, folio, no_colada, des_muestra)
             muestra.save(self.db)
-            analisis = process_table();
+            analisis = self.process_table(sheet,fila_actual)
             analisis_escoria = AnalisisEscoria(no_analisis,analisis)
             analisis_escoria.save(self.db)
             fila_actual+=1
@@ -132,32 +136,33 @@ class Xls_to_db(QMainWindow, Ui_MainWindow):
         if obs == "" and fila_actual < sheet.nrows:
             obs = sheet.cell(fila_actual+1, OBSERVACIONES).value
         if not (obs == ""):
-            reporte.add_observaciones(obs,self.db)
+            reporte.add_observaciones(self.db, obs)
 
 
-        def process_table(self):
-            elemento = 0
-            c_vacio = 0
-            analisis = []
-            while not c_vacio and ANALISIS+elemento < sheet.ncols:
-                parametro = sheet.cell(CABECERA,ANALISIS+el).value
-                #print  sheet.cell(CABECERA,ANALISIS+el).
-                if parametro == "":
-                    c_vacio = 1
-                else:
-                    value = sheet.cell(fila_actual, ANALISIS+el).value
-                    try:
-                        value = float(value)
-                        #analisis += [(parametro,val)]
-                        dato = {
-                            'parametro': parametro, 
-                            'value': value,
-                        }
-                        analisis += [dato]
-                    except ValueError:
-                        pass
-                    el += 1
-            return analisis
+    def process_table(self, sheet, fila_actual):
+        elemento = 0
+        c_vacio = 0
+        analisis = []
+        while not c_vacio and ANALISIS+elemento < sheet.ncols:
+            parametro = sheet.cell(CABECERA,ANALISIS+elemento).value
+            parametro = parametro.strip()
+            #print  sheet.cell(CABECERA,ANALISIS+el).
+            if parametro == "":
+                c_vacio = 1
+            else:
+                value = sheet.cell(fila_actual, ANALISIS+elemento).value
+                try:
+                    value = float(value)
+                    #analisis += [(parametro,val)]
+                    dato = {
+                        'parametro': parametro.replace(" ","_"), 
+                        'value': value,
+                    }
+                    analisis += [dato]
+                except ValueError:
+                    pass
+                elemento += 1
+        return analisis
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

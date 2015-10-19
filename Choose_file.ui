@@ -34,7 +34,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="txFile"/>
+        <widget class="QLineEdit" name="txtFile"/>
        </item>
        <item>
         <widget class="QPushButton" name="btChooseFile">

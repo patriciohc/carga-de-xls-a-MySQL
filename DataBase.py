@@ -1,18 +1,21 @@
+#encoding:utf-8
 import MySQLdb
+import logging
 
-DB_HOST = 'localhost' 
-DB_USER = 'root' 
-DB_PASS = 'root' 
-DB_NAME = 'laboratorio' 
-
-
+logging.basicConfig(filename='./loginfo.log', level=logging.INFO)
 class DB():
     def __init__(self):
-        datos = [DB_HOST, DB_USER, DB_PASS, DB_NAME] 
+        self.DB_HOST = 'localhost' 
+        self.DB_USER = 'root' 
+        self.DB_PASS = 'root' 
+        self.DB_NAME = 'laboratorio'
+
+        datos = [self.DB_HOST, self.DB_USER, self.DB_PASS, self.DB_NAME] 
         self.conn = MySQLdb.connect(*datos)  # Conectar a la base de datos 
 
     def run_query(self,query):
-        logging.info(query)
+        #logging.info(query)
+        print(query)
         cursor = self.conn.cursor()  # Crear un cursor 
         try:
             cursor.execute(query)  # Ejecutar una consulta  
@@ -22,7 +25,8 @@ class DB():
                 self.conn.commit()
                 data = None
         except MySQLdb.Error as err:
-            logging.error("error msyql ")
+            logging.error("error msyql en sentencia: ")
+            logging.error(query)
             data = None
         cursor.close()  # Cerrar el cursor
         return data
