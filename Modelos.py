@@ -43,7 +43,7 @@ class Reporte():
 
 
 class Escoria():
-    def __init__(self,no_analisis,folio_reporte,no_colada,descripcion,image=0):
+    def __init__(self,no_analisis,folio_reporte,no_colada,descripcion):
         self.no_analisis = int(no_analisis)
         try:
             folio_reporte = int(folio_reporte)
@@ -53,14 +53,13 @@ class Escoria():
         self.folio_reporte = str(folio_reporte)
         self.no_colada = str(no_colada)
         self.descripcion = descripcion
-        self.image = image
 
     def save(self,conexion):
         query = """ insert into escoria(ID_ANALISIS, FOLIO_REPORTE,
-                    NO_COLADA, DESCRIPCION, IMAGEN_ID) values(%s, 
+                    NO_COLADA, DESCRIPCION) values(%s, 
                     '%s', '%s', '%s', %d)""" % (self.no_analisis, 
                     self.folio_reporte, self.no_colada, 
-                    self.descripcion, self.image )
+                    self.descripcion)
         conexion.run_query(query)
 
 
