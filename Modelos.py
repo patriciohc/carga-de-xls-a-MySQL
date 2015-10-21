@@ -53,7 +53,7 @@ class Reporte():
         clientes = conexion.run_query(query)
         for cliente_db in clientes:
             cliente = cliente.strip()
-            if cliente_db[1] in cliente:
+            if cliente_db[1] in cliente.upper():
                 return cliente_db[0]
         return 0
 
