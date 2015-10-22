@@ -49,7 +49,7 @@ class Reporte():
 # determina el nombre correrto del cliente ya que en los reportes no siempre
 # se escriben los clientes correctamente
     def determinar_cliente(self,cliente,conexion):
-        query = "select NOMBRE, KEY_WORD from clientes ORDER BY ID"
+        query = "select ID_CLIENTE, KEY_WORD from clientes ORDER BY ID_CLIENTE"
         clientes = conexion.run_query(query)
         for cliente_db in clientes:
             cliente = cliente.strip()
